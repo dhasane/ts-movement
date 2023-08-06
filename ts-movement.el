@@ -40,47 +40,35 @@
       (delete-overlay overlay)
       (remhash overlay tsm/-overlays))))
 
-(defun tsm/node-prev (point)
+(defun tsm/go-to-node (point next-func)
   "Go to previous sibling of node at POINT and go to start of node."
-  (interactive "d")
   (let* ((overlay (tsm/-overlay-at-point point))
          (node (overlay-get overlay 'node))
-         (next (treesit-node-prev-sibling node)))
+         (next (funcall next-func node)))
     (when next
       (overlay-put overlay 'node next)
       (move-overlay overlay (treesit-node-start next) (treesit-node-end next))
       (goto-char (treesit-node-start next)))))
+
+(defun tsm/node-prev (point)
+  "Go to previous sibling of node at POINT and go to start of node."
+  (interactive "d")
+  (tsm/go-to-node point 'treesit-node-prev-sibling))
 
 (defun tsm/node-next (point)
   "Select next sibling of node at POINT and go to start of node."
   (interactive "d")
-  (let* ((overlay (tsm/-overlay-at-point point))
-         (node (overlay-get overlay 'node))
-         (next (treesit-node-next-sibling node)))
-    (when next
-      (overlay-put overlay 'node next)
-      (move-overlay overlay (treesit-node-start next) (treesit-node-end next))
-      (goto-char (treesit-node-start next)))))
+  (tsm/go-to-node point 'treesit-node-next-sibling))
 
 (defun tsm/node-parent (point)
   "Select parent of indicated node at POINT."
   (interactive "d")
-  (let* ((overlay (tsm/-overlay-at-point point))
-         (node (overlay-get overlay 'node))
-         (next (treesit-node-parent node)))
-    (when next
-      (overlay-put overlay 'node next)
-      (move-overlay overlay (treesit-node-start next) (treesit-node-end next)))))
+  (tsm/go-to-node point 'treesit-node-parent))
 
 (defun tsm/node-child (point)
   "Select child containing POINT of indicated node."
   (interactive "d")
-  (let* ((overlay (tsm/-overlay-at-point point))
-         (node (overlay-get overlay 'node))
-         (next (treesit-node-first-child-for-pos node point)))
-    (when next
-      (overlay-put overlay 'node next)
-      (move-overlay overlay (treesit-node-start next) (treesit-node-end next)))))
+  (tsm/go-to-node point (lambda (node) (treesit-node-first-child-for-pos node point))))
 
 (defun tsm/node-start (point)
   "Go to start of node at POINT."

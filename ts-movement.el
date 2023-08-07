@@ -95,31 +95,45 @@
     (delete-overlay overlay))
   (clrhash tsm/-overlays))
 
-(defvar ts-movement-map
-  (let ((map (make-sparse-keymap "Tree Sitter Movement")))
-    (cond ((require 'hydra nil 'noerror)
-           (defhydra tsm/hydra ()
-             "TS Movement"
-             ("d" #'tsm/delete-overlay-at-point)
-             ("b" #'tsm/node-prev)
-             ("f" #'tsm/node-next)
-             ("p" #'tsm/node-parent)
-             ("n" #'tsm/node-child)
-             ("a" #'tsm/node-start)
-             ("e" #'tsm/node-end)
-             ("m" #'tsm/node-mark))
-           (define-key map (kbd "C-c .") #'tsm/hydra/body))
-          (t
-           (define-key map (kbd "C-c . d") #'tsm/delete-overlay-at-point)
-           (define-key map (kbd "C-c . b") #'tsm/node-prev)
-           (define-key map (kbd "C-c . f") #'tsm/node-next)
-           (define-key map (kbd "C-c . p") #'tsm/node-parent)
-           (define-key map (kbd "C-c . n") #'tsm/node-child)
-           (define-key map (kbd "C-c . a") #'tsm/node-start)
-           (define-key map (kbd "C-c . e") #'tsm/node-end)
-           (define-key map (kbd "C-c . m") #'tsm/node-mark)))
-    map))
+(if (featurep 'hydra)
+    (defhydra tsm/hydra ()
+      "TS Movement"
+      ("d" #'tsm/delete-overlay-at-point "delete overlay" :column "overlay")
+      ("b" #'tsm/node-prev "prev node" :column "movement")
+      ("f" #'tsm/node-next "next node" :column "movement")
+      ("p" #'tsm/node-parent "parent node" :column "movement")
+      ("n" #'tsm/node-child "child node" :column "movement")
+      ("a" #'tsm/node-start "node start" :column "movement")
+      ("e" #'tsm/node-end "node end" :column "movement")
+      ("m" #'tsm/node-mark "node mark" :column "overlay")
+      )
+  )
 
+
+;; (defvar-keymap ts-movement-map
+;;   :repeat t
+;;   "b" #'tsm/node-prev
+;;   "f" #'tsm/node-next
+;;   "p" #'tsm/node-parent
+;;   "n" #'tsm/node-child
+;;   "a" #'tsm/node-start
+;;   "e" #'tsm/node-end
+;;   "d" #'tsm/delete-overlay-at-point
+;;   "m" #'tsm/node-mark
+;;   )
+
+(defvar-keymap ts-movement-map
+  :repeat t
+  "M-k" #'tsm/node-prev
+  "M-j" #'tsm/node-next
+  "M-h" #'tsm/node-parent
+  "M-l" #'tsm/node-child
+  "M-i" #'tsm/node-start
+  "M-e" #'tsm/node-end
+  "M-p" #'tsm/delete-overlay-at-point
+  "M-m" #'tsm/node-mark
+  )
+(fset 'ts-movement-map ts-movement-map)
 ;;;###autoload
 (define-minor-mode ts-movement-mode
   "Movement and editing commands using treesit syntax tree."

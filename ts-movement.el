@@ -13,8 +13,6 @@
 ;; Optionally depends on `hydra'.
 
 ;;; Code:
-(require 'treesit)
-
 (defvar-local tsm/-overlays (make-hash-table :test #'eq))
 
 (defun tsm/-find-overlay-at-point (point)
@@ -109,7 +107,6 @@
       )
   )
 
-
 ;; (defvar-keymap ts-movement-map
 ;;   :repeat t
 ;;   "b" #'tsm/node-prev
@@ -134,6 +131,7 @@
   "M-m" #'tsm/node-mark
   )
 (fset 'ts-movement-map ts-movement-map)
+
 ;;;###autoload
 (define-minor-mode ts-movement-mode
   "Movement and editing commands using treesit syntax tree."
